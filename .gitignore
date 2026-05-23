@@ -1,0 +1,77 @@
+# ============================================================
+# Talker-T2AV .gitignore
+# ============================================================
+
+# === Models / large binaries — never commit ===
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+*.npy
+*.npz
+*.tar
+*.tar.gz
+large-v3.pt
+
+# === Datasets / generated outputs ===
+data/
+ckpts/
+checkpoints/
+runs/
+outputs/
+grid_results/
+grid_*/
+*_phase[0-9]/
+syncnet_pipeline_work/
+*.wav
+*.mp4
+*.mp3
+*.flac
+!docs/**/*.png
+!docs/**/*.jpg
+# Bundled demo data + reference outputs under samples/ are part of the release.
+!samples/**
+
+# === Experiment logs ===
+wandb/
+tensorboard/
+*.log
+phase*.log
+nohup.out
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+.tox/
+
+# === Env / secrets ===
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+hosts
+hosts.local
+secrets/
+
+# === IDE / OS ===
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+Thumbs.db
+
+# === Local scripts (machine-specific) ===
+local_scripts/
+run_grid_[0-9]*.sh
+*.local.sh

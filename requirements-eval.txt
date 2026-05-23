@@ -1,0 +1,80 @@
+# ===============================================================
+# Talker-T2AV: requirements for evaluation only (T2AV best config)
+# Versions pinned to avatar2 (production env that produced FINAL_REPORT.md)
+# Python 3.11
+# CUDA 12.4
+# ===============================================================
+
+# ---- Core DL framework ----
+torch==2.6.0
+torchaudio==2.6.0
+torchvision==0.21.0
+transformers==5.3.0
+safetensors==0.7.0
+tokenizers==0.22.2
+sentencepiece==0.2.1
+liger_kernel==0.7.0          # used by speech_llm.py (AutoLigerKernelForCausalLM for Qwen3)
+flash_attn==2.7.4.post1      # attn_implementation='flash_attention_2' on Qwen3
+                             # NOTE: needs CUDA toolkit + torch headers to build,
+                             #       or use a prebuilt wheel matching torch 2.6 + cu124.
+
+# ---- Audio I/O & DSP ----
+openai-whisper==20250625      # Whisper large-v3 ASR + log_mel_spectrogram
+librosa==0.11.0
+soundfile==0.13.1
+scipy==1.16.3
+numpy==2.2.6
+pyloudnorm==0.2.0
+soxr==1.0.0
+
+# ---- WhisperX-VAE stack ----
+descript-audio-codec==1.0.0
+vector-quantize-pytorch==1.27.7
+pytorch-lightning==2.6.1
+torchmetrics==1.8.2           # PESQ/STOI loaded in lightning_module
+hydra-core==1.3.2
+omegaconf==2.3.0
+
+# ---- Video / Rendering (LIA-X decoder, ffmpeg muxing) ----
+opencv-python-headless==4.12.0.88
+imageio==2.37.2
+imageio-ffmpeg==0.6.0
+Pillow==12.0.0
+
+# ---- SyncNet evaluation ----
+scenedetect==0.5.1
+python_speech_features==0.6
+face-alignment==1.4.1
+
+# ---- Speaker encoder (WavLM via speaker_verification) ----
+# s3prl is NOT pip-installed; we load it from
+# deps_eval/cache_wavlm_s3prl/s3prl_s3prl_main (local copy bundled there).
+# If pip install is preferred for clean open-source: add `s3prl==0.4.x` later.
+
+# ---- ML helpers ----
+einops==0.8.2
+einx==0.3.0
+pydantic==2.12.4
+tqdm==4.67.1
+
+# ---- ASR / WER metric ----
+jiwer==4.0.0
+
+# ---- Data ----
+pandas==2.3.3   # transitive (jiwer / pretty-printers); csv module used directly elsewhere
+
+# ===============================================================
+# Excluded from avatar2's 245-package freeze (not needed for eval):
+#   - gradio / fastapi / uvicorn / starlette          (web UI)
+#   - wandb / sentry-sdk / gitpython                  (training tracking)
+#   - deepspeed / accelerate                          (training only; inference runs on single GPU)
+#   - jax / jaxlib / ml_dtypes                        (unused on this codepath)
+#   - dashscope / modelscope / openai* / huggingface_hub_cli  (cloud)
+#   - mediapipe / insightface / albucore / albumentations    (other CV pipelines)
+#   - hsemotion / facenet-pytorch / facexlib                 (alt face models)
+#   - decord / av / moviepy                                  (alt video io; cv2 + imageio cover us)
+#   - jupyter / ipython / matplotlib / tensorboard           (dev tooling)
+#   - vocos / encodec / DistVAE / xfuser / yunchang          (alt audio codecs / sequence-parallel)
+#   - tomesd / timm / diffusers                              (alt diffusion stacks)
+#   - speechmos / pesq / pystoi (only used during WhisperX-VAE *training*, not inference)
+# ===============================================================
