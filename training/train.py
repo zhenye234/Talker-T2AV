@@ -1,33 +1,19 @@
 """Talker-T2AV training entry point.
 
-Phase-1 release: this script trains the AR backbone + dual diffusion
-heads + Patch Transformer Encoders on the joint speech-video corpus.
-
-The original `train.py` shipped with five custom `TrainerCallback`s
-(TeacherForcingEvalCallback × {dh_facevid, hallo3}, ContinuationEvalCallback
-× {dh_facevid, hallo3}, EvalContinueWERCallback) that ran rich
-mid-training metrics — render + SyncNet + Whisper-WER — by importing
-`eval_teacherforcing.py`. Those have been removed for a minimal
-training-only release; reproduce the paper benchmarks separately via the
-inference-side `eval_metrics/` tooling.
-
 Usage (single node, 8 GPUs):
-    deepspeed --num_gpus 8 training/train.py training/config.json
-
-The repo-root modules (`speech_llm`, `unified_cfm`, `local_dit`,
-`llama4nar`, `whisperx_vae`, ...) are imported by adding the parent
-directory to `sys.path` below.
+    torchrun --standalone --nnodes=1 --nproc_per_node=8 \\
+        training/train.py training/config.json
 """
 import os
 import sys
 import pathlib
 from dataclasses import field
 
-# --- repo-root + this-dir on sys.path so peer + parent .py files import cleanly ---
+# Repo root + this dir on sys.path so peer + parent .py files import cleanly.
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(_HERE)
-sys.path.insert(0, _HERE)   # for ./dataset.py
-sys.path.insert(0, _REPO)   # for ../speech_llm.py and friends
+sys.path.insert(0, _HERE)
+sys.path.insert(0, _REPO)
 
 os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
 os.environ.setdefault("WANDB_PROJECT", "talker-t2av")
@@ -45,16 +31,8 @@ from speech_llm import init_model, ModelArguments  # noqa: E402
 
 
 class TrainingArguments(transformers.TrainingArguments):
-    """Same as transformers.TrainingArguments with a fused-AdamW default
-    and DDP find-unused-parameters off. Eval-callback-specific fields from
-    the original training run have been removed alongside the callbacks."""
-
     optim: str = field(default="adamw_torch_fused")
-    ddp_find_unused_parameters: bool = field(
-        default=False,
-        metadata={"help": "All trainable params now participate via dummy "
-                          "forwards in speech_llm; set False."},
-    )
+    ddp_find_unused_parameters: bool = field(default=False)
 
 
 def main() -> None:
@@ -73,12 +51,7 @@ def main() -> None:
 
     print("Loading data...")
     train_dataset = SpeechDataset("train", tokenizer, model_args)
-    eval_dataset = SpeechDataset("val", tokenizer, model_args, inference=True)
     train_dataset[0]  # touch first sample so any decode error fails loud
-
-    from torch.utils.data import Subset
-    eval_dataset = Subset(eval_dataset, indices=list(range(256)))
-    eval_dataset_loss = Subset(train_dataset, indices=list(range(64)))
 
     model = init_model(model_args)
     model.freeze_encoder()
@@ -95,7 +68,6 @@ def main() -> None:
         processing_class=tokenizer,
         args=training_args,
         train_dataset=train_dataset,
-        eval_dataset=eval_dataset_loss,
         data_collator=collator,
     )
 

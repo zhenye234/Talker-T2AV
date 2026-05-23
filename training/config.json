@@ -19,11 +19,7 @@
   "num_train_epochs": 1,
 
   "per_device_train_batch_size": 8,
-  "per_device_eval_batch_size": 8,
   "gradient_accumulation_steps": 1,
-
-  "eval_strategy": "steps",
-  "eval_steps": 5000000,
 
   "save_strategy": "steps",
   "save_steps": 5000,
@@ -42,6 +38,5 @@
   "gradient_checkpointing": true,
   "dataloader_num_workers": 4,
   "dataloader_prefetch_factor": 4,
-  "disable_tqdm": false,
-  "deepspeed": "training/ds_config_zero3.json"
+  "disable_tqdm": false
 }

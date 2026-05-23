@@ -26,27 +26,17 @@ class DataArguments:
                                 metadata={"help": "Path to the test data."})
 
 
-# Default paths — override any of these via env vars when launching training.
-TRAIN_CSV = os.environ.get("TRAIN_CSV", "./data/csv/unified_all_dataset_more_filtered.csv")
-EVAL_CSV_DH_FACEVID = os.environ.get(
-    "EVAL_CSV_DH_FACEVID", "./data/csv/dh_facevid_dataset_128.csv"
-)
-EVAL_CSV_HALLO3 = os.environ.get(
-    "EVAL_CSV_HALLO3", "./data/csv/hallo3_dataset_128.csv"
-)
-EVAL_CSV = EVAL_CSV_DH_FACEVID  # default eval csv (backward compat)
-
-# Legacy paths - TXT format (kept for backward compatibility)
-TRAIN_TXT = os.environ.get("TRAIN_TXT", "./data/txt/dh_facevid_pt_list_full40.txt")
-EVAL_TXT = os.environ.get("EVAL_TXT", "./data/txt/dh_facevid_pt_list_test40.txt")
+# Default paths — override via env vars when launching training.
+TRAIN_CSV = os.environ.get("TRAIN_CSV", "./data/csv/train.csv")
+TRAIN_TXT = os.environ.get("TRAIN_TXT", "./data/txt/train_pt_list.txt")
 VIDEO_DIR = os.environ.get("VIDEO_DIR", "./data/video")
 
-# Motion normalization stats (40-dim) — reused from the vendored LIA-X package
-# at the repo root (../lia_x/ relative to this file).
+# Motion normalization stats (40-dim) — reused from the vendored LIA-X
+# package at the repo root (../lia_x/ relative to this file).
 _LIAX_PKG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "lia_x")
 MOTION_MEAN = np.load(os.path.join(_LIAX_PKG_DIR, "motion_mean.npy")).astype(np.float32)  # (40,)
 MOTION_STD = np.load(os.path.join(_LIAX_PKG_DIR, "motion_std.npy")).astype(np.float32)    # (40,)
-MOTION_STD = np.clip(MOTION_STD, a_min=1e-6, a_max=None)  # avoid division by zero
+MOTION_STD = np.clip(MOTION_STD, a_min=1e-6, a_max=None)
 
 
 class SpeechDataset(Dataset):
@@ -87,11 +77,7 @@ class SpeechDataset(Dataset):
 
         # Load data from CSV or TXT
         if use_csv:
-            if self.data_path == 'train':
-                csv_path = TRAIN_CSV
-            else:
-                csv_path = EVAL_CSV
-
+            csv_path = TRAIN_CSV
             print(f"Loading T2SV data from CSV: {csv_path}")
             with open(csv_path, 'r') as f:
                 reader = csv.DictReader(f)
@@ -104,11 +90,7 @@ class SpeechDataset(Dataset):
             self.data_list = t2sv_list
             print(f"  T2SV 数据: {len(t2sv_list)} 条")
         else:
-            if self.data_path == 'train':
-                txt_path = TRAIN_TXT
-            else:
-                txt_path = EVAL_TXT
-
+            txt_path = TRAIN_TXT
             print(f"Loading data from TXT: {txt_path}")
             with open(txt_path, 'r') as f:
                 pt_paths = [line.strip() for line in f if line.strip()]
