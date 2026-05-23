@@ -137,6 +137,16 @@ selected purely by how much of the reference clip is fed in as a prefix:
     the prefix leaves off. Useful for long-form synthesis or seamless
     splicing.
 
+## Training
+
+The minimal training entry point lives in [`training/`](training/) — see
+its [README](training/README.md) for the data layout, env-var
+configuration, and launch command (single- or multi-node, via
+`torchrun`).
+
+The training data is hosted on HuggingFace at
+[HKUSTAudio/Talker-T2AV-Data](https://huggingface.co/datasets/HKUSTAudio/Talker-T2AV-Data).
+
 ## Repository layout
 
 ```
@@ -152,6 +162,7 @@ selected purely by how much of the reference clip is fed in as a prefix:
 │   └── networks/             # Encoder / Decoder / Generator + StyleGAN2 cpp_extension kernels
 ├── speaker_verification/     # vendored WavLM-Large ECAPA-TDNN speaker encoder
 │   └── models2/ecapa_tdnn.py
+├── training/                 # minimal training entry point (see training/README.md)
 ├── requirements-eval.txt     # Pinned package list (Python 3.11 + CUDA 12.4)
 └── samples/                  # bundled demo data for `python infer.py`
     ├── reference_audio.wav

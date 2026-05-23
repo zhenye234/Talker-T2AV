@@ -6,7 +6,7 @@ Minimal training entry point for the AR backbone + dual diffusion heads
 ```
 training/
 ├── train.py        # Trainer entry point
-├── dataset.py      # SpeechDataset (T2SV CSV + optional TTS .txt) + DynamicPadCollator
+├── dataset.py      # SpeechDataset (T2SV CSV + TTS .txt) + DynamicPadCollator
 ├── config.json     # example training-run config
 └── README.md
 ```
@@ -57,3 +57,5 @@ torchrun --standalone --nnodes=1 --nproc_per_node=8 \
 
 `Trainer` resumes from `<output_dir>/checkpoint-*` if any exists; a
 fresh run starts from `tts_checkpoint_path`.
+
+also support multi node.
