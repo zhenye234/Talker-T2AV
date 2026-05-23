@@ -1,0 +1,47 @@
+{
+  "llm_model_name_or_path": "Qwen/Qwen3-0.6B",
+  "encoder_projector_ds_rate": 12,
+  "frames_per_second": 25,
+  "speech_embedding_dim": 32,
+  "motion_embedding_dim": 40,
+  "tts_checkpoint_path": "./ckpts/tts_pretrained/checkpoint-45000",
+  "patch_size": 4,
+  "delay": 0,
+  "motion_cfm_weight": 10,
+  "context_patches": 1,
+  "patch_encoder_n_layer": 4,
+  "patch_encoder_n_head": 8,
+  "cfm_k_repeat": 2,
+  "bf16": true,
+
+  "output_dir": "./outputs/talker_t2av_run",
+  "run_name": "talker_t2av_run",
+  "num_train_epochs": 1,
+
+  "per_device_train_batch_size": 8,
+  "per_device_eval_batch_size": 8,
+  "gradient_accumulation_steps": 1,
+
+  "eval_strategy": "steps",
+  "eval_steps": 5000000,
+
+  "save_strategy": "steps",
+  "save_steps": 5000,
+  "save_total_limit": 100,
+
+  "learning_rate": 0.0001,
+  "weight_decay": 0.01,
+  "adam_beta2": 0.95,
+  "warmup_ratio": 0.1,
+  "lr_scheduler_type": "cosine_with_min_lr",
+  "lr_scheduler_kwargs": {"min_lr_rate": 0.01},
+
+  "logging_steps": 10,
+  "report_to": "wandb",
+  "model_max_length": 1000,
+  "gradient_checkpointing": true,
+  "dataloader_num_workers": 4,
+  "dataloader_prefetch_factor": 4,
+  "disable_tqdm": false,
+  "deepspeed": "training/ds_config_zero3.json"
+}
