@@ -82,6 +82,25 @@ The script writes `out.mp4` (synced video + audio) and `out.wav` (24 kHz audio
 only). Default sampling matches the paper recipe (`t=0.3, cfg=2.0, steps=10,
 prefix=0.5 s`).
 
+### Two driving modes via `--gt-prefix-seconds`
+
+The same model supports two qualitatively different generation modes,
+selected purely by how much of the reference clip is fed in as a prefix:
+
+- **`--gt-prefix-seconds 0`** — *speaker-/identity-only driving*. The model
+  sees the reference audio only through the WavLM speaker embedding (timbre)
+  and the reference video only through the first frame (face appearance).
+  Speaking style, cadence, and head motion are sampled freely from the
+  prior. Use this when you want the **voice and face** of the reference
+  but a fresh delivery.
+
+- **`--gt-prefix-seconds N>0`** — * Similar to zero-shot TTS / style cloning* (as in
+  the [VALL-E](https://arxiv.org/abs/2301.02111) paper). The
+  first `N` seconds of the reference audio + motion are fed through the
+  AR backbone before generation starts. The model continues in the
+  reference's prosody, rhythm, and head-motion style — like zero-shot
+  voice cloning, but for **speech + video together**.
+
 ## Repository layout
 
 ```

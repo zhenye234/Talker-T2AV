@@ -615,7 +615,9 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--cfm-cfg", type=float, default=2.0,
                     help="Classifier-free guidance scale.")
     ap.add_argument("--gt-prefix-seconds", type=float, default=0.5,
-                    help="Seconds of reference motion fed before AR generation begins.")
+                    help="Seconds of reference audio+motion fed before AR generation begins. "
+                         "0 = speaker/identity-only driving (free style); "
+                         ">0 = zero-shot TTS / style cloning (continues the reference's prosody and motion).")
     ap.add_argument("--fps", type=int, default=25)
 
     return ap.parse_args()
