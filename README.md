@@ -49,24 +49,44 @@ ln -s "$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe()
 
 ## Download checkpoints
 
-The pretrained weights live on HuggingFace at
-[HKUSTAudio/Talker-T2AV](https://huggingface.co/HKUSTAudio/Talker-T2AV).
-You'll need both **Talker-T2AV** (the AR backbone + diffusion heads) and
-**WhisperX-VAE** (the audio autoencoder).
+Inference needs three sets of pretrained weights. The Python sources for
+WhisperX-VAE, LIA-X and the WavLM speaker encoder are **already vendored**
+under `whisperx_vae.py`, `lia_x/`, and `speaker_verification/` — you only
+need to fetch the binary `.pt`/`.ckpt` files.
+
+**1. Talker-T2AV + WhisperX-VAE** — from
+[HKUSTAudio/Talker-T2AV](https://huggingface.co/HKUSTAudio/Talker-T2AV) on
+HuggingFace:
 
 ```bash
 huggingface-cli download HKUSTAudio/Talker-T2AV \
     --local-dir ./ckpts/hf_weights
 
-# point the inference script at them
 export CHECKPOINT_DIR=$(pwd)/ckpts/hf_weights/talker-t2av
 export WHISPERVAE_CKPT=$(pwd)/ckpts/hf_weights/whisperx-vae/model.ckpt
 ```
 
-The video motion autoencoder (**LIA-X**) is fetched separately from
-[wyhsirius/LIA-X](https://github.com/wyhsirius/LIA-X). Clone its source and
-place the weights, then export `LIAX_CKPT` and `LIAX_CODE_DIR` to those
-paths.
+**2. LIA-X video autoencoder weights** — get `lia-x.pt` from
+[wyhsirius/LIA-X](https://github.com/wyhsirius/LIA-X) (only the weight file
+is needed; the model code is vendored under `lia_x/`):
+
+```bash
+mkdir -p ./deps/LIA-X
+# place lia-x.pt here, or override LIAX_CKPT to point elsewhere
+export LIAX_CKPT=$(pwd)/deps/LIA-X/lia-x.pt
+```
+
+**3. WavLM-Large fine-tuned speaker encoder** — `wavlm_large_finetune.pth`
+from
+[microsoft/UniSpeech speaker_verification](https://github.com/microsoft/UniSpeech/tree/main/downstreams/speaker_verification)
+(again, only the weight file is needed):
+
+```bash
+export WAVLM_CKPT=/path/to/wavlm_large_finetune.pth
+```
+
+The first run will additionally fetch the upstream s3prl WavLM repo via
+`torch.hub` (cached under `~/.cache/torch/hub/` or `$S3PRL_CACHE_DIR`).
 
 ## Quickstart
 
@@ -126,6 +146,12 @@ selected purely by how much of the reference clip is fed in as a prefix:
 ├── unified_cfm.py            # OT-CFM with CFG-zero-star + sway-sampling Euler solver
 ├── local_dit.py              # Diffusion Transformer Head (VoxCPMLocDiT)
 ├── llama4nar.py              # Patch Transformer Encoder + bidirectional NAR decoder
+├── whisperx_vae.py           # vendored WhisperX-VAE audio autoencoder (encode/decode only)
+├── lia_x/                    # vendored LIA-X video motion autoencoder
+│   ├── motion_mean.npy / motion_std.npy   # 40-d motion normalization stats
+│   └── networks/             # Encoder / Decoder / Generator + StyleGAN2 cpp_extension kernels
+├── speaker_verification/     # vendored WavLM-Large ECAPA-TDNN speaker encoder
+│   └── models2/ecapa_tdnn.py
 ├── requirements-eval.txt     # Pinned package list (Python 3.11 + CUDA 12.4)
 └── samples/                  # bundled demo data for `python infer.py`
     ├── reference_audio.wav
@@ -156,3 +182,4 @@ selected purely by how much of the reference clip is fed in as a prefix:
 - LLM backbone: [Qwen3](https://github.com/QwenLM/Qwen3)
 - Audio autoencoder builds on [X-Codec-2.0](https://github.com/zhenye234/X-Codec-2.0)
 - Video motion autoencoder: [LIA-X](https://github.com/wyhsirius/LIA-X)
+- Speaker encoder: [Microsoft UniSpeech speaker_verification](https://github.com/microsoft/UniSpeech/tree/main/downstreams/speaker_verification) (WavLM-Large + ECAPA-TDNN)
