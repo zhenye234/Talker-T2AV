@@ -14,18 +14,10 @@ from liger_kernel.transformers import AutoLigerKernelForCausalLM
 import torch.distributions as D
 
 import os
-import sys
-# WavLM speaker verification module from Microsoft UniSpeech (Apache 2.0).
-# Source: https://github.com/microsoft/UniSpeech/tree/main/downstreams/speaker_verification
-# Clone the directory above to ./deps/speaker_verification/ (default below)
-# or point SPK_VERIFICATION_DIR at it. We path-import rather than vendor
-# since the upstream repo is the canonical reference.
-sys.path.append(os.environ.get(
-    'SPK_VERIFICATION_DIR',
-    os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                 'deps', 'speaker_verification'),
-))
-from verification import init_model as init_spk
+# WavLM speaker-verification encoder. Vendored under ./speaker_verification/
+# from Microsoft UniSpeech (Apache 2.0):
+#   https://github.com/microsoft/UniSpeech/tree/main/downstreams/speaker_verification
+from speaker_verification import init_model as init_spk
 
 @dataclass
 class ModelArguments:
