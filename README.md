@@ -104,8 +104,12 @@ python infer.py \
     --output     out.mp4
 ```
 
-The script writes `out.mp4` (synced video + audio) and `out.wav` (24 kHz audio
-only).
+The script writes `out.mp4` (synced video + audio).
+
+Because Talker-T2AV generates audio and video jointly in one pass, the
+same checkpoint also handles **V2A** (video dubbing — given a silent
+talking-head clip, fill in the speech) and **A2V** (audio-driven —
+given speech, animate a face), with no architectural change.
 
 ### Two driving modes via `--gt-prefix-seconds`
 
