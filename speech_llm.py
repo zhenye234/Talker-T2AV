@@ -1346,12 +1346,7 @@ class SpeechLLM(PreTrainedModel):
 def init_model(model_args):
 
     # Load WhisperX-VAE as speech encoder
-    import sys
-    sys.path.append(os.environ.get(
-        'WHISPERVAE_DIR',
-        '/apdcephfs_tj5/share_302528826/zhenye/deps_eval/code/X-Codec-2.0',
-    ))
-    from lightning_module import CodecLightningModule
+    from whisperx_vae import WhisperXVAE
     _whispervae_ckpt = os.environ.get(
         "WHISPERVAE_CKPT",
         '/apdcephfs_tj5/share_302528826/zhenye/deps_eval/models/whispervae/epoch=0-step=480000.ckpt',
@@ -1359,7 +1354,7 @@ def init_model(model_args):
     ckpt = torch.load(_whispervae_ckpt, map_location="cpu", weights_only=False)
     state_dict = ckpt["state_dict"] if isinstance(ckpt, dict) and "state_dict" in ckpt else ckpt
     cfg = ckpt['hyper_parameters']['cfg']
-    whisperx_vae = CodecLightningModule(cfg)
+    whisperx_vae = WhisperXVAE(cfg)
     whisperx_vae.load_state_dict(state_dict, strict=False)
     whisperx_vae.eval()
 
