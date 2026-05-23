@@ -106,9 +106,8 @@ selected purely by how much of the reference clip is fed in as a prefix:
   reference's prosody, rhythm, and head-motion style — like zero-shot
   voice cloning, but for **speech + video together**.
 
-  Following the standard zero-shot TTS terminology, the prefix can play
-  either of two roles depending on what you put in `--ref-audio` /
-  `--ref-motion`:
+  The prefix can play either of two roles depending on what you put in
+  `--ref-audio` / `--ref-motion`:
   - *Cross-sentence* — the reference is a **different** utterance from
     the target text. The model only borrows speaker timbre, prosody,
     and head-motion style; the synthesised content comes entirely from
