@@ -105,8 +105,7 @@ python infer.py \
 ```
 
 The script writes `out.mp4` (synced video + audio) and `out.wav` (24 kHz audio
-only). Default sampling matches the paper recipe (`t=0.3, cfg=2.0, steps=10,
-prefix=0.5 s`).
+only).
 
 ### Two driving modes via `--gt-prefix-seconds`
 
