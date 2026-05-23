@@ -13,6 +13,12 @@
 *.tar
 *.tar.gz
 large-v3.pt
+# Vendored LIA-X motion-normalization stats (~288 B each) ARE part of the release.
+!lia_x/motion_mean.npy
+!lia_x/motion_std.npy
+
+# === External-source dirs (cloned by user, not part of the repo) ===
+deps/
 
 # === Datasets / generated outputs ===
 data/

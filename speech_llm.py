@@ -15,10 +15,15 @@ import torch.distributions as D
 
 import os
 import sys
-# Use local tj copy of speaker_verification module to avoid NFS read of gy4 during import
+# WavLM speaker verification module from Microsoft UniSpeech (Apache 2.0).
+# Source: https://github.com/microsoft/UniSpeech/tree/main/downstreams/speaker_verification
+# Clone the directory above to ./deps/speaker_verification/ (default below)
+# or point SPK_VERIFICATION_DIR at it. We path-import rather than vendor
+# since the upstream repo is the canonical reference.
 sys.path.append(os.environ.get(
     'SPK_VERIFICATION_DIR',
-    '/apdcephfs_tj5/share_302528826/zhenye/deps_eval/code/speaker_verification'
+    os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                 'deps', 'speaker_verification'),
 ))
 from verification import init_model as init_spk
 

@@ -70,18 +70,21 @@ MAX_AUDIO_SAMPLES = 16000 * 30  # 480000 samples, 16 kHz × 30 s
 FEAT_DIM = 40                   # 40-dim LIA-X motion latent dimension
 SPEECH_DIM = 32                 # 32-dim speech latent dimension
 
+# LIA-X is the video motion autoencoder. The Python sources (networks/),
+# CUDA kernel sources (networks/op/*.{cpp,cu}), and motion-stat numpy arrays
+# are vendored under ./lia_x/. Upstream:
+#     https://github.com/wyhsirius/LIA-X
+# Generator weights (lia-x.pt) are not vendored — set LIAX_CKPT or place
+# the .pt at ./deps/LIA-X/lia-x.pt to use the default.
 LIAX_CKPT = os.environ.get(
     "LIAX_CKPT",
-    "/apdcephfs_tj5/share_302528826/zhenye/deps_eval/models/liax/lia-x.pt",
-)
-_LIAX_CODE_DIR = os.environ.get(
-    "LIAX_CODE_DIR",
-    "/apdcephfs_tj5/share_302528826/zhenye/deps_eval/code/LIA-X",
+    os.path.join(_HERE, "deps", "LIA-X", "lia-x.pt"),
 )
 
-# Motion stats live next to the LIA-X source.
-MOTION_MEAN = np.load(os.path.join(_LIAX_CODE_DIR, "motion_mean.npy")).astype(np.float32)  # (40,)
-MOTION_STD = np.load(os.path.join(_LIAX_CODE_DIR, "motion_std.npy")).astype(np.float32)    # (40,)
+# Motion stats live next to the vendored LIA-X sources.
+_LIAX_PKG_DIR = os.path.join(_HERE, "lia_x")
+MOTION_MEAN = np.load(os.path.join(_LIAX_PKG_DIR, "motion_mean.npy")).astype(np.float32)  # (40,)
+MOTION_STD = np.load(os.path.join(_LIAX_PKG_DIR, "motion_std.npy")).astype(np.float32)    # (40,)
 MOTION_STD = np.clip(MOTION_STD, a_min=1e-6, a_max=None)
 
 
@@ -469,9 +472,7 @@ def ar_generate_motion_continuation(
 
 def init_render_models(liax_ckpt=LIAX_CKPT):
     """Load LIA-X autoencoder for rendering. Returns dict with 'model'."""
-    if _LIAX_CODE_DIR not in sys.path:
-        sys.path.insert(0, _LIAX_CODE_DIR)
-    from networks.generator import Generator  # noqa: E402
+    from lia_x.networks.generator import Generator  # noqa: E402
 
     m = Generator(motion_dim=40, scale=2)
     state_dict = torch.load(liax_ckpt, map_location="cpu", weights_only=False)
