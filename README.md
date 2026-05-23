@@ -60,7 +60,7 @@ need to fetch the binary `.pt`/`.ckpt` files.
 HuggingFace:
 
 ```bash
-huggingface-cli download HKUSTAudio/Talker-T2AV \
+hf download HKUSTAudio/Talker-T2AV \
     --local-dir ./ckpts/hf_weights
 
 export CHECKPOINT_DIR=$(pwd)/ckpts/hf_weights/talker-t2av
@@ -106,10 +106,12 @@ python infer.py \
 
 The script writes `out.mp4` (synced video + audio).
 
-Because Talker-T2AV generates audio and video jointly in one pass, the
-same checkpoint also handles **V2A** (video dubbing — given a silent
-talking-head clip, fill in the speech) and **A2V** (audio-driven —
-given speech, animate a face), with no architectural change.
+Because Talker-T2AV encodes speech and video into temporally aligned
+latent sequences at the same 25 Hz frame rate and fuses them via
+element-wise summation in the AR backbone, the same checkpoint also
+handles **V2A** (video dubbing — given a silent talking-head clip,
+fill in the speech) and **A2V** (audio-driven — given speech, animate
+a face), with no architectural change or fine-tuning.
 
 ### Two driving modes via `--gt-prefix-seconds`
 

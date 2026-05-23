@@ -37,12 +37,6 @@ from typing import List
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 
-# Bake in env-var defaults (must run BEFORE importing torch / transformers).
-os.environ.setdefault("HF_HOME", "/apdcephfs_tj5/share_302528826/zhenye/deps_eval/hf_cache")
-os.environ.setdefault("HF_HUB_OFFLINE", "1")
-os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
-os.environ.setdefault("TORCH_CUDA_ARCH_LIST", "8.0")
-
 import cv2  # noqa: E402
 import numpy as np  # noqa: E402
 import safetensors.torch  # noqa: E402
