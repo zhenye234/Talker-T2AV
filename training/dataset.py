@@ -30,6 +30,16 @@ class DataArguments:
 TRAIN_CSV = os.environ.get("TRAIN_CSV", "./data/csv/train.csv")
 TRAIN_TXT = os.environ.get("TRAIN_TXT", "./data/txt/train_pt_list.txt")
 VIDEO_DIR = os.environ.get("VIDEO_DIR", "./data/video")
+# DATA_ROOT prefixes any relative wav/motion/video paths from the CSV.
+# Set this to the dataset root after extracting Talker-T2AV-Data shards.
+DATA_ROOT = os.environ.get("DATA_ROOT", "")
+
+
+def _resolve(path: str) -> str:
+    """Prefix `path` with DATA_ROOT if it is relative (and DATA_ROOT is set)."""
+    if not path or os.path.isabs(path) or not DATA_ROOT:
+        return path
+    return os.path.join(DATA_ROOT, path)
 
 # Motion normalization stats (40-dim) — reused from the vendored LIA-X
 # package at the repo root (../lia_x/ relative to this file).
@@ -157,7 +167,7 @@ class SpeechDataset(Dataset):
 
         data_item = self.data_list[i]
         task = data_item.get('task', 't2sv')
-        wav_path = data_item['wav_path']
+        wav_path = _resolve(data_item['wav_path'])
         is_tts = (task == 'tts')
 
         # =============================================
@@ -172,7 +182,7 @@ class SpeechDataset(Dataset):
             with open(json_path, "r", encoding="utf-8") as f:
                 text = json.load(f)["text"]
         else:
-            pt_path = data_item['motion_pt_path']
+            pt_path = _resolve(data_item['motion_pt_path'])
             text = data_item.get('text', '')
             # Load motion: [T, 40] float16 -> float32, then normalize
             motion = torch.load(pt_path, map_location='cpu', weights_only=True).detach().float().numpy()

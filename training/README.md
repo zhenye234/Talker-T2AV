@@ -25,9 +25,32 @@ Override any of these via env vars when launching:
 | `TRAIN_CSV` | `./data/csv/train.csv` | Training rows: `motion_pt_path,wav_path,text,duration,...` |
 | `TRAIN_TXT` | `./data/txt/train_pt_list.txt` | Alternative TXT format: one `.pt` motion path per line, with sidecar `.json` for the text |
 | `VIDEO_DIR` | `./data/video` | Root for `{name}.wav` lookups (TXT mode only) |
+| `DATA_ROOT` | `""` | If set, prefixed to any relative `wav_path` / `motion_pt_path` from the CSV |
 
 Motion-normalization stats are loaded from the vendored
 `../lia_x/motion_mean.npy` and `../lia_x/motion_std.npy` automatically.
+
+### Get the training data
+
+The released CSV + audio/motion shards live on HuggingFace at
+[HKUSTAudio/Talker-T2AV-Data](https://huggingface.co/datasets/HKUSTAudio/Talker-T2AV-Data).
+Paths inside `metadata/train.csv` are stored *relative to the dataset
+root*, so after downloading you only need to extract the shards and
+point `DATA_ROOT` + `TRAIN_CSV` at the result:
+
+```bash
+hf download HKUSTAudio/Talker-T2AV-Data --repo-type dataset \
+    --local-dir ./data/Talker-T2AV-Data
+cd ./data/Talker-T2AV-Data
+for f in shards/*.tar; do tar -xf "$f"; done
+cd -
+
+export DATA_ROOT=$(pwd)/data/Talker-T2AV-Data
+export TRAIN_CSV=$DATA_ROOT/metadata/train.csv
+```
+
+`dataset.py` will then resolve every `wav_path` / `motion_pt_path` row
+against `DATA_ROOT`.
 
 ## Pretrained inputs
 
