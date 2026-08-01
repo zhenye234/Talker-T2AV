@@ -8,9 +8,17 @@
 [![Samples](https://img.shields.io/badge/Samples-talker--t2av.github.io-blue)](https://talker-t2av.github.io/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-green.svg)](LICENSE)
 
+## Highlights
+
+- 🎤 **Unified talking audio-video generation** with a single autoregressive diffusion model supporting T2AV, A2V and V2A.
+- 📦 **Open-source dataset with over 1 million high-quality talking audio-video samples**, carefully curated, cleaned and organized for large-scale training.
+- 🤗 Fully open-sourced model checkpoints, training pipeline and dataset.
+
 <p align="center">
   <img src="assets/fig1.png" alt="Talker-T2AV — Joint talking audio-video generation with autoregressive diffusion modeling" width="820"/>
 </p>
+
+
 
 Talker-T2AV decouples joint talking audio-video generation into two stages:
 
